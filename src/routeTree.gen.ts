@@ -13,23 +13,35 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as BookIdImport } from './routes/book.$id'
 
 // Create Virtual Routes
 
-const DetailLazyImport = createFileRoute('/detail')()
+const FavoriteLazyImport = createFileRoute('/favorite')()
+const CreateLazyImport = createFileRoute('/create')()
 const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
 
-const DetailLazyRoute = DetailLazyImport.update({
-  path: '/detail',
+const FavoriteLazyRoute = FavoriteLazyImport.update({
+  path: '/favorite',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/detail.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/favorite.lazy').then((d) => d.Route))
+
+const CreateLazyRoute = CreateLazyImport.update({
+  path: '/create',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/create.lazy').then((d) => d.Route))
 
 const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+
+const BookIdRoute = BookIdImport.update({
+  path: '/book/$id',
+  getParentRoute: () => rootRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -42,11 +54,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexLazyImport
       parentRoute: typeof rootRoute
     }
-    '/detail': {
-      id: '/detail'
-      path: '/detail'
-      fullPath: '/detail'
-      preLoaderRoute: typeof DetailLazyImport
+    '/create': {
+      id: '/create'
+      path: '/create'
+      fullPath: '/create'
+      preLoaderRoute: typeof CreateLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/favorite': {
+      id: '/favorite'
+      path: '/favorite'
+      fullPath: '/favorite'
+      preLoaderRoute: typeof FavoriteLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/book/$id': {
+      id: '/book/$id'
+      path: '/book/$id'
+      fullPath: '/book/$id'
+      preLoaderRoute: typeof BookIdImport
       parentRoute: typeof rootRoute
     }
   }
@@ -56,7 +82,9 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexLazyRoute,
-  DetailLazyRoute,
+  CreateLazyRoute,
+  FavoriteLazyRoute,
+  BookIdRoute,
 })
 
 /* prettier-ignore-end */
@@ -68,14 +96,22 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/detail"
+        "/create",
+        "/favorite",
+        "/book/$id"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
     },
-    "/detail": {
-      "filePath": "detail.lazy.tsx"
+    "/create": {
+      "filePath": "create.lazy.tsx"
+    },
+    "/favorite": {
+      "filePath": "favorite.lazy.tsx"
+    },
+    "/book/$id": {
+      "filePath": "book.$id.tsx"
     }
   }
 }
