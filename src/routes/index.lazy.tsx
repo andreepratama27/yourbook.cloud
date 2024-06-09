@@ -1,26 +1,37 @@
-import { useQuery } from "@tanstack/react-query";
-import { Link, createLazyFileRoute } from "@tanstack/react-router";
-import { ArrowLeft, HeartIcon } from "lucide-react";
-import { getBook } from "../services/book.service";
-import { useState } from "react";
+import { createLazyFileRoute } from "@tanstack/react-router";
+import { useInView } from "react-intersection-observer";
 import Navbar from "../components/navbar";
 import Jumbotron from "../components/jumbotron";
 import BookCard from "../components/book-card";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { getBook } from "../services/book.service";
+import { useEffect, useState } from "react";
 
 export const Route = createLazyFileRoute("/")({
 	component: IndexPage,
 });
 
 function IndexPage() {
-	const [params] = useState({
-		offset: 0,
-		limit: 5,
+	const [page, setPage] = useState(0);
+	const { inView, ref } = useInView({
+		threshold: 0,
 	});
-	const { data } = useQuery({
-		queryKey: ["get-books", params],
-		queryFn: getBook,
-		staleTime: 10000,
+
+	const { data, fetchNextPage } = useInfiniteQuery({
+		queryKey: ["get-books"],
+		queryFn: () => getBook({ pageParam: page }),
+		initialPageParam: 0,
+		getNextPageParam: (lastPage) => {
+			return lastPage.nextPage;
+		},
 	});
+
+	useEffect(() => {
+		if (inView) {
+			setPage((prevState) => prevState + 4);
+			fetchNextPage();
+		}
+	}, [inView, fetchNextPage]);
 
 	return (
 		<>
@@ -36,10 +47,14 @@ function IndexPage() {
 					</div>
 
 					<div className="book-wrapper space-y-4 grid grid-cols-2 gap-4">
-						{data?.map((book) => (
-							<BookCard key={book.id} {...book} />
-						))}
+						{data?.pages?.map((page) => {
+							return page.data.map((book) => (
+								<BookCard key={book.id} {...book} />
+							));
+						})}
 					</div>
+
+					<div ref={ref} />
 				</div>
 			</main>
 		</>

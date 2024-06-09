@@ -1,51 +1,32 @@
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
 import type { Book } from "../services/book.service";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 interface State {
 	book: Book[];
-	favorite: Book[];
 }
 
 interface Action {
-	setBook: (book: Book) => void;
-	setFavorite: (book: Book) => void;
-	isFavorite: (id: number) => boolean;
+	setBook: (book: Book[]) => void;
+	addBook: (book: Book) => void;
 }
 
 const bookStore = create<State & Action>()(
 	persist(
-		(set, get) => {
+		(set) => {
 			return {
 				book: [],
-				favorite: [],
 
 				setBook(bookParams) {
-					set((state) => ({
-						...state,
-						book: [...state.book, bookParams],
+					set(() => ({
+						book: bookParams,
 					}));
 				},
 
-				setFavorite(bookParams) {
-					if (get().isFavorite(bookParams.id)) {
-						const filteredState = get().favorite.filter(
-							(item) => item.id !== bookParams.id,
-						);
-						set((state) => ({
-							...state,
-							favorite: filteredState,
-						}));
-					} else {
-						set((state) => ({
-							...state,
-							favorite: [...state.favorite, bookParams],
-						}));
-					}
-				},
-
-				isFavorite(id): boolean {
-					return !!get().favorite.find((bookItem) => bookItem.id === id);
+				addBook(bookParams) {
+					set((state) => ({
+						book: [...state.book, bookParams],
+					}));
 				},
 			};
 		},

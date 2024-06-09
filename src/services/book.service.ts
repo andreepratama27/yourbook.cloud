@@ -2,7 +2,7 @@
 import axios from "../libs/axios";
 
 export interface Book {
-	id: number;
+	id?: number;
 	title: string;
 	description: string;
 	cover: string;
@@ -10,18 +10,23 @@ export interface Book {
 	author: string;
 }
 
-interface Params {
-	offset: number;
-	limit: number;
+interface ApiResponse<T> {
+	data: T;
+	total: number;
+	nextPage: number | null;
 }
 
 const getBook = async ({
-	offset = 0,
-	limit = 5,
-}: Partial<Params>): Promise<Book[]> => {
+	pageParam = 0,
+}: { pageParam: number }): Promise<ApiResponse<Book[]>> => {
 	try {
-		const response = await axios.get(`/books?_start=${offset}&_limit=${limit}`);
-		return response.data;
+		const response = await axios.get(`/books?_start=${pageParam}&_limit=4`);
+
+		return {
+			total: 16,
+			data: response.data,
+			nextPage: pageParam,
+		};
 	} catch (error) {
 		// biome-ignore lint/complexity/noUselessCatch: <explanation>
 		throw error;

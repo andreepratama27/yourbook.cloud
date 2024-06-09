@@ -2,10 +2,10 @@ import { HeartIcon } from "lucide-react";
 import type { Book } from "../../services/book.service";
 import { Link } from "@tanstack/react-router";
 import { useStore } from "zustand";
-import useBookStore from "../../store/book.store";
+import favoriteStore from "../../store/favorite.store";
 
 export default function BookCard(book: Book) {
-	const { setFavorite, isFavorite } = useStore(useBookStore);
+	const { setFavorite, isFavorite } = useStore(favoriteStore);
 
 	return (
 		<div className="book-card w-full shadow rounded p-4" key={book.id}>
