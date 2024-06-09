@@ -1,4 +1,4 @@
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute, useRouter } from "@tanstack/react-router";
 import Navbar from "../components/navbar";
 import { Form } from "../components/form";
 import Input from "../components/ui/input";
@@ -9,7 +9,6 @@ import Button from "../components/ui/button";
 import ImageUploader from "../components/image-uploader";
 import { useStore } from "zustand";
 import bookStore from "../store/book.store";
-import { QueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
 	title: z.string({ message: "Title is required" }),
@@ -23,7 +22,16 @@ export const Route = createLazyFileRoute("/create")({
 	component: CreatePage,
 });
 
+function bookPromise() {
+	return new Promise((resolve) => {
+		setTimeout(() => {
+			resolve(3000);
+		}, 3000);
+	});
+}
+
 function CreatePage() {
+	const router = useRouter();
 	const { addBook } = useStore(bookStore);
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -33,8 +41,10 @@ function CreatePage() {
 		formState: { errors },
 	} = form;
 
-	const onSubmit = (values: z.infer<typeof formSchema>) => {
+	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		addBook({ ...values, id: Math.floor(Math.random() * 10000) });
+
+		router.navigate({ to: "/" });
 	};
 
 	return (

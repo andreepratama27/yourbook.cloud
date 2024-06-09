@@ -1,15 +1,16 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import Navbar from "../components/navbar";
 import { useStore } from "zustand";
-import bookStore from "../store/book.store";
 import FavoriteCard from "../components/favorite-card";
+import favoriteStore from "../store/favorite.store";
 
 export const Route = createLazyFileRoute("/favorite")({
 	component: FavoritePage,
 });
 
 function FavoritePage() {
-	const { favorite } = useStore(bookStore);
+	const { favorite } = useStore(favoriteStore);
+
 	return (
 		<>
 			<Navbar />

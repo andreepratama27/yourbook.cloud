@@ -6,6 +6,8 @@ import BookCard from "../components/book-card";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { getBook } from "../services/book.service";
 import { useEffect, useState } from "react";
+import { useStore } from "zustand";
+import bookStore from "../store/book.store";
 
 export const Route = createLazyFileRoute("/")({
 	component: IndexPage,
@@ -13,6 +15,7 @@ export const Route = createLazyFileRoute("/")({
 
 function IndexPage() {
 	const [page, setPage] = useState(0);
+	const { book } = useStore(bookStore);
 	const { inView, ref } = useInView({
 		threshold: 0,
 	});
@@ -47,6 +50,10 @@ function IndexPage() {
 					</div>
 
 					<div className="book-wrapper space-y-4 grid grid-cols-2 gap-4">
+						{book.map((bookItem) => (
+							<BookCard key={bookItem.id} {...bookItem} />
+						))}
+
 						{data?.pages?.map((page) => {
 							return page.data.map((book) => (
 								<BookCard key={book.id} {...book} />
