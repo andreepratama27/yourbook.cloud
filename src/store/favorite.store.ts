@@ -18,7 +18,7 @@ const favoriteStore = create<State & Action>()(
 				favorite: [],
 
 				setFavorite(bookParams) {
-					if (get().isFavorite(bookParams.id)) {
+					if (get().isFavorite(bookParams.id as number)) {
 						const filteredState = get().favorite.filter(
 							(item) => item.id !== bookParams.id,
 						);

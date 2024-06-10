@@ -9,11 +9,12 @@ interface State {
 interface Action {
 	setBook: (book: Book[]) => void;
 	addBook: (book: Book) => void;
+	removeBook: (bookId: number) => void;
 }
 
 const bookStore = create<State & Action>()(
 	persist(
-		(set) => {
+		(set, get) => {
 			return {
 				book: [],
 
@@ -26,6 +27,16 @@ const bookStore = create<State & Action>()(
 				addBook(bookParams) {
 					set((state) => ({
 						book: [...state.book, bookParams],
+					}));
+				},
+
+				removeBook(bookId) {
+					const filteredBook = get().book.filter(
+						(bookItem) => bookItem.id !== bookId,
+					);
+					set((state) => ({
+						...state,
+						book: filteredBook,
 					}));
 				},
 			};

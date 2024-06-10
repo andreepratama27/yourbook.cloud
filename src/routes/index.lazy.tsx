@@ -8,6 +8,7 @@ import { getBook } from "../services/book.service";
 import { useEffect, useState } from "react";
 import { useStore } from "zustand";
 import bookStore from "../store/book.store";
+import Loader from "../components/loader";
 
 export const Route = createLazyFileRoute("/")({
 	component: IndexPage,
@@ -20,13 +21,15 @@ function IndexPage() {
 		threshold: 0,
 	});
 
-	const { data, fetchNextPage } = useInfiniteQuery({
+	const { data, isLoading, isFetching, fetchNextPage } = useInfiniteQuery({
 		queryKey: ["get-books"],
 		queryFn: () => getBook({ pageParam: page }),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage) => {
 			return lastPage.nextPage;
 		},
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
 	});
 
 	useEffect(() => {
@@ -35,6 +38,24 @@ function IndexPage() {
 			fetchNextPage();
 		}
 	}, [inView, fetchNextPage]);
+
+	const renderContent = () => {
+		if (isLoading) {
+			return <Loader />;
+		}
+
+		return (
+			<div className="book-wrapper space-y-4 grid grid-cols-2 gap-4">
+				{book.map((bookItem) => (
+					<BookCard key={bookItem.id} {...bookItem} />
+				))}
+
+				{data?.pages?.map((page) => {
+					return page.data.map((book) => <BookCard key={book.id} {...book} />);
+				})}
+			</div>
+		);
+	};
 
 	return (
 		<>
@@ -49,19 +70,15 @@ function IndexPage() {
 						<p className="text-lg font-semibold">Book Collections</p>
 					</div>
 
-					<div className="book-wrapper space-y-4 grid grid-cols-2 gap-4">
-						{book.map((bookItem) => (
-							<BookCard key={bookItem.id} {...bookItem} />
-						))}
+					{renderContent()}
 
-						{data?.pages?.map((page) => {
-							return page.data.map((book) => (
-								<BookCard key={book.id} {...book} />
-							));
-						})}
+					<div ref={ref}>
+						{isFetching && (
+							<div className="mt-4">
+								<Loader />
+							</div>
+						)}
 					</div>
-
-					<div ref={ref} />
 				</div>
 			</main>
 		</>

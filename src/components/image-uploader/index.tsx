@@ -9,7 +9,12 @@ export default function ImageUploader({ onChange }: Props) {
 	const [preview, setPreview] = useState("");
 
 	const handleUploadFile = (evt: React.ChangeEvent<HTMLInputElement>) => {
-		setPreview(URL.createObjectURL(evt.target?.files?.[0] as File));
+		const files = evt.target.files?.[0];
+		const reader = new FileReader();
+		reader.onloadend = () => {
+			setPreview(reader.result as string);
+		};
+		reader.readAsDataURL(files as File);
 	};
 
 	useEffect(() => {

@@ -22,14 +22,6 @@ export const Route = createLazyFileRoute("/create")({
 	component: CreatePage,
 });
 
-function bookPromise() {
-	return new Promise((resolve) => {
-		setTimeout(() => {
-			resolve(3000);
-		}, 3000);
-	});
-}
-
 function CreatePage() {
 	const router = useRouter();
 	const { addBook } = useStore(bookStore);
